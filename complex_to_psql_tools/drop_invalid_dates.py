@@ -1,19 +1,21 @@
 from __future__ import print_function
 from __future__ import unicode_literals
-import time
 import csv
 # we have some very big multi-line fields going above the default 128 KB limit
 # fortunately they are all still smaller than 1 MB
 csv.field_size_limit(max(1024 ** 2, csv.field_size_limit()))
 import sys
+import iso8601
 
 
 def date_or_None(datestr):
     if datestr:
         try:
-            time.strptime(datestr, '%Y%m%d')
+            iso8601.parse_date(datestr)
             return datestr
-        except ValueError:
+            # parsed = iso8601.parse_date(datestr)
+            # return parsed.strftime('%Y-%m-%d')
+        except iso8601.ParseError:
             pass
 
     return None
