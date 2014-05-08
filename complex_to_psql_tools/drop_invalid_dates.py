@@ -46,7 +46,7 @@ def date_or_None(datestr):
     return None
 
 
-def drop_invalid_dates(fields, csv_reader, csv_writer):
+def drop_invalid_dates(fields, csv_reader, csv_writer, invalid_dropper):
     header = csv_reader.next()
     date_field_indices = {header.index(field) for field in fields}
 
@@ -57,7 +57,7 @@ def drop_invalid_dates(fields, csv_reader, csv_writer):
             # FIXME: it should use the correct date validator
             # in the second release - we need the bad version
             # available for reproducability's sake
-            row[i] = date_or_None_9940110(row[i])
+            row[i] = invalid_dropper(row[i])
         csv_writer.writerow(row)
 
 
@@ -68,7 +68,8 @@ def main():
             drop_invalid_dates(
                 fields.split(','),
                 csv.reader(input_csv_file),
-                csv.writer(output_csv_file)
+                csv.writer(output_csv_file),
+                date_or_None_9940110,
             )
 
 if __name__ == '__main__':

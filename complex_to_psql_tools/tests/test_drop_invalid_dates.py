@@ -55,11 +55,11 @@ class Test_date_or_None(unittest.TestCase):
 
 class Test_drop_invalid_dates(unittest.TestCase):
 
-    def test(self):
+    def drop_invalid_dates(self, invalid_dropper):
         input = [
             'a,date1,b,date2,c',
             'a,date1,b,date2,c',
-            'a,20140429,b,20131231,c',
+            'a,20140429,b,2013-12-31,c',
         ]
 
         output = BytesIO()
@@ -67,14 +67,30 @@ class Test_drop_invalid_dates(unittest.TestCase):
         m.drop_invalid_dates(
             ['date2', 'date1'],
             csv.reader(input),
-            csv.writer(output)
+            csv.writer(output),
+            invalid_dropper,
         )
 
+        return unicode(output.getvalue())
+
+    def test_legacy_bad(self):
+        output = self.drop_invalid_dates(m.date_or_None_9940110)
+        self.assertEquals(
+            [
+                'a,date1,b,date2,c',
+                'a,,b,,c',
+                'a,2014-04-29,b,,c',
+            ],
+            output.splitlines()
+        )
+
+    def test_iso8601(self):
+        output = self.drop_invalid_dates(m.date_or_None)
         self.assertEquals(
             [
                 'a,date1,b,date2,c',
                 'a,,b,,c',
                 'a,2014-04-29,b,2013-12-31,c',
             ],
-            unicode(output.getvalue()).splitlines()
+            output.splitlines()
         )
