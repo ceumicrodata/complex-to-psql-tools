@@ -29,6 +29,9 @@ class Test_date_or_None_9940110(unittest.TestCase):
     def test_iso_extended_dates_are_kept(self):
         self.assertIsNone(self.convert('2014-04-29'))
 
+    def test_old_date_is_replaced_w_None(self):
+        self.assertIsNone(self.convert('11120720'))
+
 
 class Test_date_or_None(unittest.TestCase):
 
@@ -51,6 +54,9 @@ class Test_date_or_None(unittest.TestCase):
 
     def test_malformed_9940110_is_replaced_w_None(self):
         self.assertIsNone(self.convert('9940110'))
+
+    def test_old_date_is_replaced_w_None(self):
+        self.assertIsNone(self.convert('11120720'))
 
 
 class Test_drop_invalid_dates(unittest.TestCase):

@@ -9,6 +9,7 @@ csv.field_size_limit(max(1024 ** 2, csv.field_size_limit()))
 import sys
 import iso8601
 import time
+import argparse
 
 
 def date_or_None_9940110(datestr):
@@ -37,9 +38,13 @@ def date_or_None_9940110(datestr):
 
 def date_or_None(datestr):
     if datestr:
+        parsed = None
         try:
             parsed = iso8601.parse_date(datestr)
-            return parsed.strftime('%Y-%m-%d')
+            try:
+                return parsed.strftime('%Y-%m-%d')
+            except ValueError:
+                pass
         except iso8601.ParseError:
             pass
 
@@ -61,15 +66,49 @@ def drop_invalid_dates(fields, csv_reader, csv_writer, invalid_dropper):
         csv_writer.writerow(row)
 
 
+def parse_args(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--bad-parser',
+        dest='invalid_dropper',
+        default=date_or_None,
+        action='store_const',
+        const=date_or_None_9940110,
+        help='''
+        This option is exclusively for reproducing the original
+        Complex2012 import!
+
+        (When used an old, bad date parser is used instead of the iso8601
+        parser, that will e.g. convert date 9940110 to 9940-01-10,
+        while can not interpret 1994-01-10 as it contains dashes.)
+        ''',
+    )
+
+    def comma_separated_fields_to_list(fields):
+        return fields.split(',')
+    parser.add_argument(
+        'fields',
+        type=comma_separated_fields_to_list,
+        help='''
+        comma separated fields that should be checked.
+        e.g. hattol,hatig,bkelt,tkelt
+        ''',
+    )
+    parser.add_argument('input_csv')
+    parser.add_argument('output_csv')
+
+    return parser.parse_args(argv)
+
+
 def main():
-    fields, input_csv, output_csv = sys.argv[1:]
-    with open(input_csv, 'rb') as input_csv_file:
-        with open(output_csv, 'wb') as output_csv_file:
+    args = parse_args(sys.argv[1:])
+    with open(args.input_csv, 'rb') as input_csv_file:
+        with open(args.output_csv, 'wb') as output_csv_file:
             drop_invalid_dates(
-                fields.split(','),
+                args.fields,
                 csv.reader(input_csv_file),
                 csv.writer(output_csv_file),
-                date_or_None_9940110,
+                args.invalid_dropper,
             )
 
 if __name__ == '__main__':
