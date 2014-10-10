@@ -67,7 +67,12 @@ def drop_invalid_dates(fields, csv_reader, csv_writer, invalid_dropper):
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='''\
+        substitutes None for bad dates on input,
+        and also converts formats dates as YYYY-MM-DD
+        '''
+    )
     parser.add_argument(
         '--bad-parser',
         dest='invalid_dropper',
@@ -94,22 +99,18 @@ def parse_args(argv):
         e.g. hattol,hatig,bkelt,tkelt
         ''',
     )
-    parser.add_argument('input_csv')
-    parser.add_argument('output_csv')
 
     return parser.parse_args(argv)
 
 
 def main():
     args = parse_args(sys.argv[1:])
-    with open(args.input_csv, 'rb') as input_csv_file:
-        with open(args.output_csv, 'wb') as output_csv_file:
-            drop_invalid_dates(
-                args.fields,
-                csv.reader(input_csv_file),
-                csv.writer(output_csv_file),
-                args.invalid_dropper,
-            )
+    drop_invalid_dates(
+        args.fields,
+        csv.reader(sys.stdin),
+        csv.writer(sys.stdout),
+        args.invalid_dropper,
+    )
 
 if __name__ == '__main__':
     main()
