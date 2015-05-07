@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import complex_schema
+from pipes import quote
 
 
 def generate_date_fixer(r_export_txt_xls, input_dir, output_dir):
@@ -25,10 +26,10 @@ def generate_date_fixer(r_export_txt_xls, input_dir, output_dir):
             )
 
             if os.path.exists(input_file):
-                command = 'drop-invalid-dates {} {} {}'.format(
-                    ','.join(date_fields),
-                    input_file,
-                    output_file,
+                command = 'drop-invalid-dates {} < {} > {}'.format(
+                    quote(','.join(date_fields)),
+                    quote(input_file),
+                    quote(output_file),
                 )
 
                 yield command

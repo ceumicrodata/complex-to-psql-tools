@@ -37,8 +37,8 @@ class Test(unittest.TestCase):
         )
 
         expected = [
-            'drop-invalid-dates hattol,hatig rovat_1.csv output/rovat_1.csv',
-            'drop-invalid-dates hattol,hatig rovat_2.csv output/rovat_2.csv',
+            'drop-invalid-dates hattol,hatig < rovat_1.csv > output/rovat_1.csv',
+            'drop-invalid-dates hattol,hatig < rovat_2.csv > output/rovat_2.csv',
         ]
         self.assertEquals(expected, commands)
 
@@ -56,6 +56,6 @@ class Test(unittest.TestCase):
         )
 
         expected = [
-            'drop-invalid-dates hattol,hatig rovat_2.csv output/rovat_2.csv',
+            'drop-invalid-dates hattol,hatig < rovat_2.csv > output/rovat_2.csv',
         ]
         self.assertEquals(expected, commands)
